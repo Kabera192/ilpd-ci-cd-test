@@ -1,0 +1,47 @@
+# Service for Gateway
+apiVersion: v1
+kind: Service
+metadata:
+  name: gateway-service
+  namespace: ilpd-mis
+  labels:
+    app: gateway-service
+spec:
+  type: ClusterIP
+  selector:
+    app: gateway-service
+  ports:
+  - port: 8082
+    targetPort: 8082
+    protocol: TCP
+    name: http
+---
+
+# ============================================
+# INGRESS - Exposes Gateway to the internet
+# This routes external traffic to your gateway
+# ============================================
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ilpd-ingress
+  namespace: ilpd-mis
+  annotations:
+    # For nginx ingress controller
+    kubernetes.io/ingress.class: "nginx"
+    # Optional: SSL redirect
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    # Optional: CORS
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+spec:
+  rules:
+  - host: mis.ilpd.ac.rw
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: gateway-service
+            port:
+              number: 8082

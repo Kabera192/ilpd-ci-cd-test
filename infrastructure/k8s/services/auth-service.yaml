@@ -1,0 +1,21 @@
+# ============================================
+# SERVICE - Network endpoint for the deployment
+# File: k8s/services/auth-service.yaml
+# ============================================
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth-service
+  namespace: ilpd-mis
+  labels:
+    app: auth-service
+spec:
+  type: ClusterIP  # Internal service only
+  selector:
+    app: auth-service
+  ports:
+  - port: 8085        # Service port (what other services use)
+    targetPort: 8085  # Container port (what your app uses)
+    protocol: TCP
+    name: http
+  sessionAffinity: None

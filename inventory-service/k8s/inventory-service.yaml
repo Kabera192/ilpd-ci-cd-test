@@ -1,0 +1,21 @@
+# ============================================
+# SERVICE - Network endpoint for the deployment
+# File: k8s/services/inventory-service.yaml
+# ============================================
+apiVersion: v1
+kind: Service
+metadata:
+  name: inventory-service
+  namespace: ilpd-mis
+  labels:
+    app: inventory-service
+spec:
+  type: ClusterIP  # Internal service only
+  selector:
+    app: inventory-service
+  ports:
+  - port: 8088        # Service port (what other services use)
+    targetPort: 8088  # Container port (what your app uses)
+    protocol: TCP
+    name: http
+  sessionAffinity: None

@@ -1,0 +1,33 @@
+# ===============================================
+# Configs that are common for different services
+# File: k8s/configmaps/common-configmap.yaml
+# ===============================================
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: common-configmap
+  namespace: ilpd-mis
+data:
+  # Swagger configurations
+  SWAGGER_API_DOCS_PATH: "/api/v1/auth/api-docs"
+  SWAGGER_UI_PATH: "/api/v1/auth/swagger-ui"
+
+  # SMTP Configurations
+  SPRING_MAIL_HOST: "smtp.gmail.com"
+  SPRING_MAIL_PORT: "587"
+
+  #Mongo configurations
+  MONGO_HOST: "localhost"
+  MONGO_PORT: "27017"
+
+  # RabbitMQ configurations
+  RABBIT_HOST: "localhost"
+  RABBIT_PORT: "5672"
+  RABBIT_EXCHANGE: "events"
+
+  # Service registry url
+  SERVICE_REGISTRY_URL: "http://service-registry:8761/eureka/"
+
+  # Redis configurations
+  REDIS_HOST: "localhost"
+  REDIS_PORT: "6379"

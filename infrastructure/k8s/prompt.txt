@@ -1,0 +1,20 @@
+Hi Claude,
+
+I have been tasked with writing kubernetes config files for a project which has over 8 microservices. For context, the project is for a school and the microservices include the following:
+
+- auth-service: Handles everything authentication related.
+- academic-service: Handles everything academics oriented such as grades, assignments and the like.
+- registration-service: Handles everything to do with intake applications and so on.
+- hostel-service: The school also has a hotel and so this would handle management of that business process.
+- notificaiton-service: Handles everything to do with notifications.
+- payment-service: Handles everything to do with payment of tuition and other fees.
+- service-registry: Contains the Eurreka service registry
+- gateway-service: Has the Springboot API Gateway that redirects calls to the appropriate service.
+
+Currently, the way the project is working, when the devs push code to github, some automated process builds the project, creates a docker image/images for each microservice and somehow they are accessible on the testing server. I don't know this is all working to be honest. What is confusing me is why do they need kubernetes? What is it going to solve?
+
+Secondly, do I need namespaces for the kubernetes configuration?
+
+Third, can you explain to me what kubernetes components I will have to create in order to have this working.
+
+Last, for now, I think we should use config maps and secrets, does that mean that I will have to go into the application.properties of each microservice and add the environment variables inside it? How will the environment variables I set in these config files going to be related to those in application.properties for each springboot project?

@@ -1,0 +1,88 @@
+# =====================================================
+# DEPLOYMENT - Defines pods and containers
+# File: k8s/deployments/payment-service-deployment.yaml
+# =====================================================
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: payment-service
+  namespace: ilpd-mis
+  labels:
+    app: payment-service
+    version: v1
+spec:
+  replicas: 2  # Run 2 instances for high availability
+  selector:
+    matchLabels:
+      app: payment-service
+  template:
+    metadata:
+      labels:
+        app: payment-service
+        version: v1
+    spec:
+      containers:
+      - name: payment-service
+        image: kaberagclap/payment-service:fd3585f # Tag is the hash of the lates commit from the command: `git rev-parse --short HEAD`
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8090
+          name: http
+        
+        # Environment variables from ConfigMap
+        envFrom:
+        - configMapRef:
+            name: payment-service-configmap
+        - configMapRef:
+            name: common-configmap
+        
+        # Environment variables from Secret
+        env:
+        - name: DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: common-secrets
+              key: DB_USERNAME
+        - name: DB_PWD
+          valueFrom:
+            secretKeyRef:
+              name: common-secrets
+              key: DB_PASSWORD
+        - name: MONGO_USER
+          valueFrom:
+            secretKeyRef:
+              name: common-secrets
+              key: MONGO_USER
+        - name: MONGO_PWD
+          valueFrom:
+            secretKeyRef:
+              name: common-secrets
+              key: MONGO_PWD
+        - name: MONGO_DB_AUTH
+          valueFrom:
+            secretKeyRef:
+              name: common-secrets
+              key: MONGO_DB_AUTH
+        
+        # Liveness probe - restart if unhealthy
+        livenessProbe:
+          httpGet:
+            path: /actuator/health/liveness
+            port: 8090
+          initialDelaySeconds: 60
+          periodSeconds: 10
+          timeoutSeconds: 3
+          failureThreshold: 3
+        
+        # Readiness probe - remove from load balancer if not ready
+        readinessProbe:
+          httpGet:
+            path: /actuator/health/readiness
+            port: 8090
+          initialDelaySeconds: 30
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+      
+      # Graceful shutdown
+      terminationGracePeriodSeconds: 30

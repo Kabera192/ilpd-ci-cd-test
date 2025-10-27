@@ -1,0 +1,17 @@
+# ============================================
+# CONFIGMAP - Non-sensitive configuration
+# File: k8s/configmaps/reporting-service-configmap.yaml
+# ============================================
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: reporting-service-configmap
+  namespace: ilpd-mis
+data:
+  # Application configuration
+  SERVER_PORT: "8086"
+
+  PROFILE_MODE: "dev"
+
+  # Mongo Configurations
+  MONOG_DB: "report_db"

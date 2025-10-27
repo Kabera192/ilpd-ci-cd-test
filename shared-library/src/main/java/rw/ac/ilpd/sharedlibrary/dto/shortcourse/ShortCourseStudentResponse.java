@@ -1,0 +1,29 @@
+/*
+ * File: ShortCourseStudentResponse.java
+ * 
+ * Description: Data Transfer Object representing a student enrolled in a short course.
+ *              Contains information about the student's enrollment, including intake ID,
+ *              user ID, status, and creation timestamp. Validation constraints ensure
+ *              that intakeId, userId, status, and createdAt are not null.
+ * 
+ * Author: Kabera Clapton (ckabera6@gmail.com)
+ * Last Modified: 2025-07-07
+ */
+package rw.ac.ilpd.sharedlibrary.dto.shortcourse;
+
+
+
+import lombok.*;
+
+@Setter
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+public class ShortCourseStudentResponse {
+    private String id;
+    private String intakeId;
+    private String userId;
+    private String status;
+    private String createdAt;
+}

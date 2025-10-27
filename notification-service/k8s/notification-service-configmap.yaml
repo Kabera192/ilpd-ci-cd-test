@@ -1,0 +1,20 @@
+# ============================================
+# CONFIGMAP - Non-sensitive configuration
+# File: k8s/configmaps/notification-service-configmap.yaml
+# ============================================
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: notification-service-configmap
+  namespace: ilpd-mis
+data:
+  # Application configuration
+  SERVER_PORT: "8091"
+
+  PROFILE_MODE: "dev"
+
+  # Mongo Configurations
+  MONGO_DB: "notification_db"
+
+  MINIO_SERVER_END_POINT: "http://localhost:9000"
+  MINIO_CLIENT_END_POINT: "http://localhost:9000"

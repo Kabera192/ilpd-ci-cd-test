@@ -1,0 +1,21 @@
+# ============================================
+# SERVICE - Network endpoint for the deployment
+# File: k8s/services/notification-service.yaml
+# ============================================
+apiVersion: v1
+kind: Service
+metadata:
+  name: notification-service
+  namespace: ilpd-mis
+  labels:
+    app: notification-service
+spec:
+  type: ClusterIP  # Internal service only
+  selector:
+    app: notification-service
+  ports:
+  - port: 8091        # Service port (what other services use)
+    targetPort: 8091  # Container port (what your app uses)
+    protocol: TCP
+    name: http
+  sessionAffinity: None

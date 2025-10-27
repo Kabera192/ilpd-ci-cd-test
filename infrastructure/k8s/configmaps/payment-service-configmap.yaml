@@ -1,0 +1,20 @@
+# ============================================
+# CONFIGMAP - Non-sensitive configuration
+# File: k8s/configmaps/payment-service-configmap.yaml
+# ============================================
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: payment-service-configmap
+  namespace: ilpd-mis
+data:
+  # Application configuration
+  SERVER_PORT: "8090"
+  
+  # Database configuration (URL only, no credentials)
+  DB_URL: "jdbc:postgresql://localhost:5433/payment_db"
+
+  PROFILE_MODE: "dev"
+
+  # Mongo Configurations
+  MONOG_DB: "payment_db"

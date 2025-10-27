@@ -1,0 +1,17 @@
+# ============================================
+# CONFIGMAP - Non-sensitive configuration
+# File: k8s/configmaps/hostel-service-configmap.yaml
+# ============================================
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: hostel-service-configmap
+  namespace: ilpd-mis
+data:
+  # Application configuration
+  SERVER_PORT: "8087"
+
+  PROFILE_MODE: "dev"
+
+  # Mongo Configurations
+  HSR_DB: "hostel_db"

@@ -1,0 +1,21 @@
+# ============================================
+# SERVICE - Network endpoint for the deployment
+# File: k8s/services/registration-service.yaml
+# ============================================
+apiVersion: v1
+kind: Service
+metadata:
+  name: registration-service
+  namespace: ilpd-mis
+  labels:
+    app: registration-service
+spec:
+  type: ClusterIP  # Internal service only
+  selector:
+    app: registration-service
+  ports:
+  - port: 8089        # Service port (what other services use)
+    targetPort: 8089  # Container port (what your app uses)
+    protocol: TCP
+    name: http
+  sessionAffinity: None

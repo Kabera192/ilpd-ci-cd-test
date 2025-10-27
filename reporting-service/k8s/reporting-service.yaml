@@ -1,0 +1,21 @@
+# ============================================
+# SERVICE - Network endpoint for the deployment
+# File: k8s/services/reporting-service.yaml
+# ============================================
+apiVersion: v1
+kind: Service
+metadata:
+  name: reporting-service
+  namespace: ilpd-mis
+  labels:
+    app: reporting-service
+spec:
+  type: ClusterIP  # Internal service only
+  selector:
+    app: reporting-service
+  ports:
+  - port: 8086        # Service port (what other services use)
+    targetPort: 8086  # Container port (what your app uses)
+    protocol: TCP
+    name: http
+  sessionAffinity: None

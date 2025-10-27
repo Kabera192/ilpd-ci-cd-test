@@ -1,0 +1,20 @@
+# ============================================
+# CONFIGMAP - Non-sensitive configuration
+# File: k8s/configmaps/academic-service-configmap.yaml
+# ============================================
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: academic-service-configmap
+  namespace: ilpd-mis
+data:
+  # Application configuration
+  SERVER_PORT: "8092"
+  
+  # Database configuration (URL only, no credentials)
+  DB_URL: "jdbc:postgresql://localhost:5433/academic_db"
+
+  PROFILE_MODE: "dev"
+
+  # Mongo Configurations
+  ACA_DB: "academic_db"

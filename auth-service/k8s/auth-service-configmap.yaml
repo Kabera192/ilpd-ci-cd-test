@@ -1,0 +1,23 @@
+# ============================================
+# CONFIGMAP - Non-sensitive configuration
+# File: k8s/configmaps/auth-service-configmap.yaml
+# ============================================
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: auth-service-configmap
+  namespace: ilpd-mis
+data:
+  # Application configuration
+  SERVER_PORT: "8085"
+  
+  # Database configuration (URL only, no credentials)
+  DB_URL: "jdbc:postgresql://localhost:5433/auth_db"
+
+  PASSWORD_RESET_TOKEN_EXPIRY_HRS: 24
+  PROFILE_MODE: "dev"
+  SPRING_APP_JWT_VALID_DURATION: "3600"
+  SPRING_APP_JWT_REFRESHABLE_DURATION: "86400"
+
+  # Mongo Configurations
+  MONGO_DB: "auth_db"

@@ -1,0 +1,88 @@
+# =====================================================
+# DEPLOYMENT - Defines pods and containers
+# File: k8s/deployments/registration-service-deployment.yaml
+# =====================================================
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: registration-service
+  namespace: ilpd-mis
+  labels:
+    app: registration-service
+    version: v1
+spec:
+  replicas: 2  # Run 2 instances for high availability
+  selector:
+    matchLabels:
+      app: registration-service
+  template:
+    metadata:
+      labels:
+        app: registration-service
+        version: v1
+    spec:
+      containers:
+      - name: registration-service
+        image: kaberagclap/registration-service:fd3585f # Tag is the hash of the lates commit from the command: `git rev-parse --short HEAD`
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8089
+          name: http
+        
+        # Environment variables from ConfigMap
+        envFrom:
+        - configMapRef:
+            name: registration-service-configmap
+        - configMapRef:
+            name: common-configmap
+        
+        # Environment variables from Secret
+        env:
+        - name: SPRING_APP_JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: auth-service-secret
+              key: JWT_SECRET
+        - name: SPRING_APP_JWT_ISSUER
+          valueFrom:
+            secretKeyRef:
+              name: auth-service-secret
+              key: JWT_ISSUER
+        - name: MONGO_USER
+          valueFrom:
+            secretKeyRef:
+              name: common-secrets
+              key: MONGO_USER
+        - name: MONGO_PWD
+          valueFrom:
+            secretKeyRef:
+              name: common-secrets
+              key: MONGO_PWD
+        - name: MONGO_DB_AUTH
+          valueFrom:
+            secretKeyRef:
+              name: common-secrets
+              key: MONGO_DB_AUTH
+        
+        # Liveness probe - restart if unhealthy
+        livenessProbe:
+          httpGet:
+            path: /actuator/health/liveness
+            port: 8089
+          initialDelaySeconds: 60
+          periodSeconds: 10
+          timeoutSeconds: 3
+          failureThreshold: 3
+        
+        # Readiness probe - remove from load balancer if not ready
+        readinessProbe:
+          httpGet:
+            path: /actuator/health/readiness
+            port: 8089
+          initialDelaySeconds: 30
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+      
+      # Graceful shutdown
+      terminationGracePeriodSeconds: 30

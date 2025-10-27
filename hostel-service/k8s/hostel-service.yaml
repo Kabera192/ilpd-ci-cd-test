@@ -1,0 +1,21 @@
+# ============================================
+# SERVICE - Network endpoint for the deployment
+# File: k8s/services/hostel-service.yaml
+# ============================================
+apiVersion: v1
+kind: Service
+metadata:
+  name: hostel-service
+  namespace: ilpd-mis
+  labels:
+    app: hostel-service
+spec:
+  type: ClusterIP  # Internal service only
+  selector:
+    app: hostel-service
+  ports:
+  - port: 8087        # Service port (what other services use)
+    targetPort: 8087  # Container port (what your app uses)
+    protocol: TCP
+    name: http
+  sessionAffinity: None

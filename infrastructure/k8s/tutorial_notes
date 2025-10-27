@@ -1,0 +1,55 @@
+                                                                 KUBERNETES (K8S)
+								 ----------------
+What is Kubernetes?
+
+Open-source container orchestration tool developed by google. It helps you manage applications with many containers (docker or otherwise) that are deployed in different environments e.g. physical machines, VMs, cloud or hybrid.
+
+What problem does Kubernetes solve and what is its role?
+
+The rise of the microservices architecture led to the rise in the use of containers since they are perfect ways of deploying independent services. Projects therefore ended up having hundreds and sometimes thousands of containers who management would have been complex when done with hand made scripts. This led to the rise of container orchestration tools like kubernetes.
+
+Container orchestration technologies thus guarantee the following:
+
+- high availability, the application is always available to the users. 
+
+- scalability
+
+- disaster recovery
+
+Kubernetes Components:
+----------------------
+
+Node: The server on which pods will reside. This can be a physical or virtual machine.
+
+Pod: The smallest unit of kubernetes and it is an abstraction of the container so that you can easily switch out the container technologies. This abstraction helps you to also not have to interact directly with the container technology, and instead focus on the kubernetes layer.
+
+Therefore, with this set up, you have a pod with a container in it, and the pod is running inside the node. It is usually the case that a pod has only one container. Some times you might have multiple containers inside the same pod and this is what is called the side-car pattern.
+
+Kubernetes provides networking for its pods. Each pod, when created, it is assigned an IP address, an internal IP of course. Now kubernetes pods are known also as "ephemeral" meaning, they can die easily, when the container crashes or something else happens. When this happens, the pod is recreated and assigned a new IP. This can be super frustrating coz then you have to change the IP everytime the pod dies and is recreated.
+
+Enter, the Service acts as the permanent address for the pod and its lifecycle is separate from that of the pod, therefore pod ephemeral-ness does not affect it. The service can then be used to communicate with the pod.
+
+You would want your application to be accessible on the browser, and for this to work you would have to create an External Service. The issue with the external service is that it would give you an IP and port number to work with. If you need something with a domain name and what not you would need Ingress.
+
+With Ingress, the request first goes to Ingress, then it forwards it to the service for further processing.
+
+Applications are usually built with their configs stored in things like the application.properties file for Spring/Java. However, this is not ideal since everytime such a config changes, you need to rebuild the application image, push it to docker, pull it in your pod and restart the pod. Enter, ConfigMap, in this we store all the configurations of the app and then connect it to the pod so that the pod has access to those configurations.
+
+However, ConfigMap is not perfect since it stores its stuff in plain text. This is not good for configurations for passwords and things like that. Enter, Secret, and this is like config map only that its data is stored in base 64 and thus suitable for security sensitive data that should not be kept in plain text.
+
+You can use the things in configmap or secret as environment variables in your pod.
+
+Whenever pods are restarted, they lose the data that they had running on them. Sometimes you want this data to be persisted to some sort of storage. For example if your pod is a database pod. To solve this, enter, Volumes. Here K8S attached an external storage such as the local machine's hard drive, a remote storage or something so that the data generated that pod is persisted to that storage.
+
+Let's take a scenario where you have to restart your pod, this would lead to a downtime since users cannot access your application since the pod is down. To solve this, K8S has something called, Deployments. A deployment is a component that is used to describe that you want your pods to be replicates across multiple nodes. The replica pods are then linked to the same service enabling users to always access the application. The service also acts as a load balancer for the replicas.
+
+However, if your pod contains a database application, then you cannot replicate it with a deployment. This is because databases are stateful i.e. the data they contain. If you want to replicate the database then you would need a way to ensure that there are no inconsistencies in the data. You have to link the pods to the same storage and monitor which pod writes and reads from the database and ensure data consistency.
+
+Enter Stateful Set, and this helps you manage stateful applications such as databases and so on. However, this can be quite tedious hence it is common to have the database hosted outside the k8s cluster and have the cluster contain stateless applications that can communicate with the external database.
+
+Kubernetes Architecture:
+------------------------
+
+TODO: Do more research on how k8s worker and master nodes work. It went over my head.
+
+

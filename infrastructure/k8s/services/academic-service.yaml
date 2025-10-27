@@ -1,0 +1,21 @@
+# ============================================
+# SERVICE - Network endpoint for the deployment
+# File: k8s/services/academic-service.yaml
+# ============================================
+apiVersion: v1
+kind: Service
+metadata:
+  name: academic-service
+  namespace: ilpd-mis
+  labels:
+    app: academic-service
+spec:
+  type: ClusterIP  # Internal service only
+  selector:
+    app: academic-service
+  ports:
+  - port: 8092        # Service port (what other services use)
+    targetPort: 8092  # Container port (what your app uses)
+    protocol: TCP
+    name: http
+  sessionAffinity: None

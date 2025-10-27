@@ -1,0 +1,98 @@
+# =====================================================
+# DEPLOYMENT - Defines pods and containers
+# File: k8s/deployments/academic-service-deployment.yaml
+# =====================================================
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: academic-service
+  namespace: ilpd-mis
+  labels:
+    app: academic-service
+    version: v1
+spec:
+  replicas: 2  # Run 2 instances for high availability
+  selector:
+    matchLabels:
+      app: academic-service
+  template:
+    metadata:
+      labels:
+        app: academic-service
+        version: v1
+    spec:
+      containers:
+      - name: academic-service
+        image: kaberagclap/academic-service:fd3585f # Tag is the hash of the lates commit from the command: `git rev-parse --short HEAD`
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8092
+          name: http
+        
+        # Environment variables from ConfigMap
+        envFrom:
+        - configMapRef:
+            name: academic-service-configmap
+        - configMapRef:
+            name: common-configmap
+        
+        # Environment variables from Secret
+        env:
+        - name: DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: common-secrets
+              key: DB_USERNAME
+        - name: DB_PWD
+          valueFrom:
+            secretKeyRef:
+              name: common-secrets
+              key: DB_PASSWORD
+        - name: MONGO_USER
+          valueFrom:
+            secretKeyRef:
+              name: common-secrets
+              key: MONGO_USER
+        - name: MONGO_PWD
+          valueFrom:
+            secretKeyRef:
+              name: common-secrets
+              key: MONGO_PWD
+        - name: MONGO_AUTH_DB
+          valueFrom:
+            secretKeyRef:
+              name: common-secrets
+              key: MONGO_AUTH_DB
+        - name: RABBIT_USER
+          valueFrom:
+            secretKeyRef:
+              name: common-secrets
+              key: RABBIT_USER
+        - name: RABBIT_PWD
+          valueFrom:
+            secretKeyRef:
+              name: common-secrets
+              key: RABBIT_PWD
+        
+        # Liveness probe - restart if unhealthy
+        livenessProbe:
+          httpGet:
+            path: /actuator/health/liveness
+            port: 8092
+          initialDelaySeconds: 60
+          periodSeconds: 10
+          timeoutSeconds: 3
+          failureThreshold: 3
+        
+        # Readiness probe - remove from load balancer if not ready
+        readinessProbe:
+          httpGet:
+            path: /actuator/health/readiness
+            port: 8092
+          initialDelaySeconds: 30
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+      
+      # Graceful shutdown
+      terminationGracePeriodSeconds: 30

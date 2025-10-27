@@ -1,0 +1,21 @@
+# ============================================
+# CONFIGMAP - Non-sensitive configuration
+# File: k8s/configmaps/registration-service-configmap.yaml
+# ============================================
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: registration-service-configmap
+  namespace: ilpd-mis
+data:
+  # Application configuration
+  SERVER_PORT: "8089"
+
+  PROFILE_MODE: "dev"
+
+  # Mongo Configurations
+  MONOG_DB: "academic_db"
+
+  AUTH_SERVICE_URL: "http://auth-service:8085"
+
+  CORS_ORIGINS: "*"

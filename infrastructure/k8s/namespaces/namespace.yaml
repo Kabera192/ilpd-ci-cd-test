@@ -1,0 +1,11 @@
+# ============================================
+# NAMESPACE
+# File: k8s/namespaces/namespace.yaml
+# Create this FIRST and only once for all services
+# ============================================
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ilpd-mis
+  labels:
+    name: ilpd-mis

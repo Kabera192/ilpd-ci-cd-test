@@ -1,0 +1,185 @@
+name: ILPD MIS CI/CD Workflow
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+env:
+  DOCKER_REGISTRY: docker.io
+  DOCKER_USERNAME: kaberagclap
+  K8S_NAMESPACE: ilpd-mis
+
+jobs:
+  # Detect which services changed
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      auth: ${{ steps.filter.outputs.auth }}
+      academic: ${{ steps.filter.outputs.academic }}
+      registration: ${{ steps.filter.outputs.registration }}
+      hostel: ${{ steps.filter.outputs.hostel }}
+      notification: ${{ steps.filter.outputs.notification }}
+      payment: ${{ steps.filter.outputs.payment }}
+      gateway: ${{ steps.filter.outputs.gateway }}
+      registry: ${{ steps.filter.outputs.registry }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v2
+        id: filter
+        with:
+          filters: |
+            auth:
+              - 'auth-service/**'
+            academic:
+              - 'academic-service/**'
+            registration:
+              - 'registration-service/**'
+            hostel:
+              - 'hostel-service/**'
+            notification:
+              - 'notification-service/**'
+            payment:
+              - 'payment-service/**'
+            gateway:
+              - 'gateway-service/**'
+            registry:
+              - 'service-registry/**'
+
+  # Build and push Docker images
+  build-and-push:
+    needs: detect-changes
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service:
+          - name: auth-service
+            changed: ${{ needs.detect-changes.outputs.auth }}
+          - name: academic-service
+            changed: ${{ needs.detect-changes.outputs.academic }}
+          - name: registration-service
+            changed: ${{ needs.detect-changes.outputs.registration }}
+          - name: hostel-service
+            changed: ${{ needs.detect-changes.outputs.hostel }}
+          - name: notification-service
+            changed: ${{ needs.detect-changes.outputs.notification }}
+          - name: payment-service
+            changed: ${{ needs.detect-changes.outputs.payment }}
+          - name: gateway-service
+            changed: ${{ needs.detect-changes.outputs.gateway }}
+          - name: service-registry
+            changed: ${{ needs.detect-changes.outputs.registry }}
+    
+    steps:
+      - name: Checkout code
+        if: matrix.service.changed == 'true'
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        if: matrix.service.changed == 'true'
+        uses: docker/setup-buildx-action@v2
+
+      - name: Login to Docker Hub
+        if: matrix.service.changed == 'true'
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Generate image tag
+        if: matrix.service.changed == 'true'
+        id: meta
+        run: |
+          COMMIT_HASH=$(git rev-parse --short HEAD)
+          echo "tag=${COMMIT_HASH}" >> $GITHUB_OUTPUT
+          echo "image=${{ env.DOCKER_USERNAME }}/${{ matrix.service.name }}:${COMMIT_HASH}" >> $GITHUB_OUTPUT
+
+      - name: Build and push Docker image
+        if: matrix.service.changed == 'true'
+        uses: docker/build-push-action@v4
+        with:
+          context: ./${{ matrix.service.name }}
+          push: true
+          tags: |
+            ${{ env.DOCKER_USERNAME }}/${{ matrix.service.name }}:${{ steps.meta.outputs.tag }}
+            ${{ env.DOCKER_USERNAME }}/${{ matrix.service.name }}:latest
+          cache-from: type=registry,ref=${{ env.DOCKER_USERNAME }}/${{ matrix.service.name }}:buildcache
+          cache-to: type=registry,ref=${{ env.DOCKER_USERNAME }}/${{ matrix.service.name }}:buildcache,mode=max
+
+  # Deploy to Kubernetes
+  deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'  # Only deploy from main branch
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v3
+
+      - name: Configure Kubernetes context
+        run: |
+          mkdir -p $HOME/.kube
+          echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > $HOME/.kube/config
+
+      - name: Get commit hash
+        id: vars
+        run: echo "tag=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+
+      - name: Deploy to Kubernetes
+        run: |
+          COMMIT_HASH=${{ steps.vars.outputs.tag }}
+          
+          # Update image tags for all services
+          kubectl set image deployment/auth-service \
+            auth-service=${{ env.DOCKER_USERNAME }}/auth-service:${COMMIT_HASH} \
+            -n ${{ env.K8S_NAMESPACE }}
+          
+          kubectl set image deployment/academic-service \
+            academic-service=${{ env.DOCKER_USERNAME }}/academic-service:${COMMIT_HASH} \
+            -n ${{ env.K8S_NAMESPACE }}
+          
+          kubectl set image deployment/registration-service \
+            registration-service=${{ env.DOCKER_USERNAME }}/registration-service:${COMMIT_HASH} \
+            -n ${{ env.K8S_NAMESPACE }}
+          
+          kubectl set image deployment/hostel-service \
+            hostel-service=${{ env.DOCKER_USERNAME }}/hostel-service:${COMMIT_HASH} \
+            -n ${{ env.K8S_NAMESPACE }}
+          
+          kubectl set image deployment/notification-service \
+            notification-service=${{ env.DOCKER_USERNAME }}/notification-service:${COMMIT_HASH} \
+            -n ${{ env.K8S_NAMESPACE }}
+          
+          kubectl set image deployment/payment-service \
+            payment-service=${{ env.DOCKER_USERNAME }}/payment-service:${COMMIT_HASH} \
+            -n ${{ env.K8S_NAMESPACE }}
+          
+          kubectl set image deployment/gateway-service \
+            gateway-service=${{ env.DOCKER_USERNAME }}/gateway-service:${COMMIT_HASH} \
+            -n ${{ env.K8S_NAMESPACE }}
+          
+          kubectl set image deployment/service-registry \
+            service-registry=${{ env.DOCKER_USERNAME }}/service-registry:${COMMIT_HASH} \
+            -n ${{ env.K8S_NAMESPACE }}
+
+      - name: Wait for rollout to complete
+        run: |
+          kubectl rollout status deployment/auth-service -n ${{ env.K8S_NAMESPACE }}
+          kubectl rollout status deployment/academic-service -n ${{ env.K8S_NAMESPACE }}
+          kubectl rollout status deployment/registration-service -n ${{ env.K8S_NAMESPACE }}
+          kubectl rollout status deployment/hostel-service -n ${{ env.K8S_NAMESPACE }}
+          kubectl rollout status deployment/notification-service -n ${{ env.K8S_NAMESPACE }}
+          kubectl rollout status deployment/payment-service -n ${{ env.K8S_NAMESPACE }}
+          kubectl rollout status deployment/gateway-service -n ${{ env.K8S_NAMESPACE }}
+          kubectl rollout status deployment/service-registry -n ${{ env.K8S_NAMESPACE }}
+
+      - name: Verify deployment
+        run: |
+          kubectl get pods -n ${{ env.K8S_NAMESPACE }}
+          kubectl get services -n ${{ env.K8S_NAMESPACE }}

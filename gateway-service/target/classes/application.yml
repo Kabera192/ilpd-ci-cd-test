@@ -1,0 +1,116 @@
+spring:
+  application:
+    name: GATEWAY-SERVICE
+  cloud:
+    gateway:
+      routes:
+        # Microservices routes
+        - id: auth-service
+          uri: lb://AUTH-SERVICE
+          predicates:
+            - Path=/api/v1/auth/**
+          filters:
+            - StripPrefix=0
+        - id: inventory-service
+          uri: lb://INVENTORY-SERVICE
+          predicates:
+            - Path=/api/v1/inventory/**
+          filters:
+            - StripPrefix=3
+        - id: notification-service
+          uri: lb://NOTIFICATION-SERVICE
+          predicates:
+            - Path=/api/v1/notification/**
+          filters:
+            - StripPrefix=3
+        - id: Registration-service
+          uri: lb://REGISTRATION-SERVICE
+          predicates:
+            - Path=/api/v1/registration/**
+          filters:
+            - StripPrefix=0
+        - id: Payment-service
+          uri: lb://PAYMENT-SERVICE
+          predicates:
+            - Path=/api/v1/payment/**
+          filters:
+            - StripPrefix=3
+        - id: Academic-service
+          uri: lb://ACADEMIC-SERVICE
+          predicates:
+            - Path=/api/v1/academic/**
+          filters:
+            - StripPrefix=3
+        - id: Hostel-service
+          uri: lb://HOSTEL-SERVICE
+          predicates:
+            - Path=/api/v1/hostel/**
+          filters:
+            - StripPrefix=3
+        - id: Reporting-service
+          uri: lb://REPORTING-SERVICE
+          predicates:
+            - Path=/api/v1/reporting/**
+          filters:
+            - StripPrefix=3
+
+server:
+  port: 8082
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://0.0.0.0:8761/eureka/
+  instance:
+    hostname: localhost
+    # For remote server, consider using actual server IP/hostname instead of localhost
+
+# Swagger UI Configuration
+springdoc:
+  enable-native-support: true
+  api-docs:
+    enabled: true
+  swagger-ui:
+    tags-sorter: alpha
+    operations-sorter: alpha
+    enabled: true
+    path: /swagger-ui.html
+    urls:
+      - url: /api/v1/auth/v3/api-docs
+        name: Auth Service
+      - url: /api/v1/notification/v3/api-docs
+        name: Notification Service
+      - url: /api/v1/registration/v3/api-docs
+        name: Registration Service
+      # - url: /api/v1/payment/v3/api-docs
+      #   name: Payment Service
+      - url: /api/v1/academic/v3/api-docs
+        name: Academic Service
+      - url: /api/v1/inventory/v3/api-docs
+        name: Inventory Service
+      - url: /api/v1/hostel/v3/api-docs
+        name: Hostel Service
+      - url: /api/v1/reporting/v3/api-docs
+        name: Reporting Service
+
+# Additional configuration for remote server
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always
+
+# Logging configuration for debugging (optional)
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG
+    org.springframework.web.cors: DEBUG
+    org.springframework.web.cors.CorsProcessor: TRACE
+    org.springframework.cloud.gateway.filter.cors: DEBUG
+    org.springframework.cloud.gateway.handler.predicate: DEBUG
+    root: INFO
