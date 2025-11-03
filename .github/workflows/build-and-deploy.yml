@@ -134,7 +134,7 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: ../../
-          file: ./${{ matrix.service.name }}
+          file: ./${{ matrix.service.name }}/Dockerfile
           push: true
           tags: |
             ${{ env.DOCKER_USERNAME }}/${{ matrix.service.name }}:${{ steps.meta.outputs.tag }}
