@@ -24,7 +24,7 @@ public class AcademicServiceApplication {
 
 	@EventListener(ApplicationReadyEvent.class)
 	public void testRabbitConnection() {
-		System.out.println("=== Application started, testing RabbitMQ connection ===");
+		System.out.println("=== Application started, testing RabbitMQ connection ==");
 	}
 
 }
