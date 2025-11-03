@@ -19,7 +19,7 @@ RUN mkdir -p auth-service reporting-service payment-service \
 # Copy and build shared-library first
 COPY shared-library/pom.xml ./shared-library/pom.xml
 COPY shared-library/src ./shared-library/src
-# RUN cd shared-library && mvn clean install -DskipTests
+RUN cd shared-library && mvn clean install -DskipTests -pl shared-library
 
 COPY auth-service/pom.xml ./auth-service/pom.xml
 COPY reporting-service/pom.xml ./reporting-service/pom.xml
@@ -33,7 +33,7 @@ COPY gateway-service/pom.xml ./gateway-service/pom.xml
 
 # Copy service pom.xml and download dependencies
 COPY service-registry/pom.xml ./service-registry/pom.xml
-# RUN mvn dependency:resolve || true
+RUN mvn dependency:resolve -pl service-registry -am || true
 
 # Copy source code and build
 COPY service-registry/src ./service-registry/src
