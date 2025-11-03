@@ -3,23 +3,22 @@ FROM maven:3.9-eclipse-temurin-21-alpine AS build
 
 WORKDIR /build
 
+# Copy parent pom.xml first
+COPY pom.xml ./pom.xml
+
 # Copy Maven wrapper if it exists
 COPY gateway-service/mvnw* .
 COPY gateway-service/.mvn .mvn
 
-# Copy parent pom.xml first
-COPY pom.xml ./pom.xml
+# Copy and build shared-library first
+COPY shared-library ./shared-library
+RUN mvn clean install -DskipTests -pl shared-library -am
 
 # Create directories for all microservices
 RUN mkdir -p auth-service reporting-service payment-service \
     registration-service hostel-service service-registry \
     inventory-service notification-service gateway-service \
-    shared-library academic-service
-
-# Copy and build shared-library first
-COPY shared-library/pom.xml ./shared-library/pom.xml
-COPY shared-library/src ./shared-library/src
-RUN cd shared-library && mvn clean install -DskipTests -pl shared-library -am
+    academic-service
 
 COPY auth-service/pom.xml ./auth-service/pom.xml
 COPY reporting-service/pom.xml ./reporting-service/pom.xml
