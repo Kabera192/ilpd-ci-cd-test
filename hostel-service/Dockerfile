@@ -19,7 +19,7 @@ RUN mkdir -p auth-service reporting-service payment-service \
 # Copy and build shared-library first
 COPY ./shared-library/pom.xml ./shared-library/pom.xml
 COPY ./shared-library/src ./shared-library/src
-RUN cd shared-library && mvn clean install -DskipTests -pl shared-library
+RUN cd shared-library && mvn clean install -DskipTests -pl shared-library -am
 
 COPY ./auth-service/pom.xml ./auth-service/pom.xml
 COPY ./reporting-service/pom.xml ./reporting-service/pom.xml
