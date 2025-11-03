@@ -37,7 +37,7 @@ COPY academic-service/pom.xml ./academic-service/pom.xml
 
 # Copy source code and build
 COPY academic-service/src ./academic-service/src
-RUN mvn clean package -DskipTests -pl academic-service -am
+RUN mvn -B -U --no-transfer-progress clean package -DskipTests -pl academic-service -am
 
 # Runtime stage
 FROM eclipse-temurin:21-jre-alpine

@@ -36,7 +36,7 @@ COPY reporting-service/pom.xml ./reporting-service/pom.xml
 
 # Copy source code and build
 COPY reporting-service/src ./reporting-service/src
-RUN mvn clean package -DskipTests -pl reporting-service -am
+RUN mvn -B -U --no-transfer-progress clean package -DskipTests -pl reporting-service -am
 
 # Runtime stage
 FROM eclipse-temurin:21-jre-alpine

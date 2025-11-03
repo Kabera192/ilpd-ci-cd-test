@@ -37,7 +37,7 @@ COPY inventory-service/pom.xml ./inventory-service/pom.xml
 
 # Copy source code and build
 COPY inventory-service/src ./inventory-service/src
-RUN mvn clean package -DskipTests -pl inventory-service -am
+RUN mvn -B -U --no-transfer-progress clean package -DskipTests -pl inventory-service -am
 
 # Runtime stage
 FROM eclipse-temurin:21-jre-alpine

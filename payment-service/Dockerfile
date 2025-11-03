@@ -37,7 +37,7 @@ COPY payment-service/pom.xml ./payment-service/pom.xml
 
 # Copy source code and build
 COPY payment-service/src ./payment-service/src
-RUN mvn clean package -DskipTests -pl payment-service -am
+RUN mvn -B -U --no-transfer-progress clean package -DskipTests -pl payment-service -am
 
 # Runtime stage
 FROM eclipse-temurin:21-jre-alpine
