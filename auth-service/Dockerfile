@@ -37,7 +37,7 @@ COPY auth-service/pom.xml ./auth-service/pom.xml
 
 # Copy source code and build
 COPY auth-service/src ./auth-service/src
-RUN mvn -B -U --no-transfer-progress clean package -DskipTests -pl auth-service -am
+RUN mvn -B --no-transfer-progress clean package -DskipTests -pl auth-service -am
 
 # Runtime stage
 FROM eclipse-temurin:21-jre-alpine

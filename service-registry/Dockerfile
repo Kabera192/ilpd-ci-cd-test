@@ -37,7 +37,7 @@ COPY service-registry/pom.xml ./service-registry/pom.xml
 
 # Copy source code and build
 COPY service-registry/src ./service-registry/src
-RUN mvn -B -U --no-transfer-progress clean package -DskipTests -pl service-registry -am
+RUN mvn -B --no-transfer-progress clean package -DskipTests -pl service-registry -am
 
 # Runtime stage
 FROM eclipse-temurin:21-jre-alpine

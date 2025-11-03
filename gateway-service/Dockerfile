@@ -37,7 +37,7 @@ COPY gateway-service/pom.xml ./gateway-service/pom.xml
 
 # Copy source code and build
 COPY gateway-service/src ./gateway-service/src
-RUN mvn -B -U --no-transfer-progress clean package -DskipTests -pl gateway-service -am
+RUN mvn -B --no-transfer-progress clean package -DskipTests -pl gateway-service -am
 
 # Runtime stage
 FROM eclipse-temurin:21-jre-alpine

@@ -37,7 +37,7 @@ COPY hostel-service/pom.xml ./hostel-service/pom.xml
 
 # Copy source code and build
 COPY hostel-service/src ./hostel-service/src
-RUN mvn -B -U --no-transfer-progress clean package -DskipTests -pl hostel-service -am
+RUN mvn -B --no-transfer-progress clean package -DskipTests -pl hostel-service -am
 
 # Runtime stage
 FROM eclipse-temurin:21-jre-alpine

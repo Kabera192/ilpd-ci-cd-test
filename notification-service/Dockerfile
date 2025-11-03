@@ -37,7 +37,7 @@ COPY notification-service/pom.xml ./notification-service/pom.xml
 
 # Copy source code and build
 COPY notification-service/src ./notification-service/src
-RUN mvn -B -U --no-transfer-progress clean package -DskipTests -pl notification-service -am
+RUN mvn -B --no-transfer-progress clean package -DskipTests -pl notification-service -am
 
 # Runtime stage
 FROM eclipse-temurin:21-jre-alpine
