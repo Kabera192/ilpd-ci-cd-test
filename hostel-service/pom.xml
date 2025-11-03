@@ -47,11 +47,11 @@
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
         </dependency>
-        <dependency>
+	<!-- <dependency>
             <groupId>rw.ac.ilpd</groupId>
             <artifactId>academic-service</artifactId>
             <version>0.0.1-SNAPSHOT</version>
-        </dependency>
+	</dependency> -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-mongodb</artifactId>
