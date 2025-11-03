@@ -10,10 +10,6 @@ COPY pom.xml ./pom.xml
 COPY service-registry/mvnw* .
 COPY service-registry/.mvn .mvn
 
-# Copy and build shared-library first
-COPY shared-library ./shared-library
-RUN mvn clean install -DskipTests -pl shared-library -am
-
 # Create directories for all microservices
 RUN mkdir -p auth-service reporting-service payment-service \
     registration-service hostel-service service-registry \
@@ -29,6 +25,10 @@ COPY academic-service/pom.xml ./academic-service/pom.xml
 COPY inventory-service/pom.xml ./inventory-service/pom.xml
 COPY notification-service/pom.xml ./notification-service/pom.xml
 COPY gateway-service/pom.xml ./gateway-service/pom.xml
+
+# Copy and build shared-library first
+COPY shared-library ./shared-library
+RUN mvn clean install -DskipTests -pl shared-library -am
 
 # Copy service pom.xml and download dependencies
 COPY service-registry/pom.xml ./service-registry/pom.xml
