@@ -57,25 +57,25 @@ jobs:
         with:
           filters: |
             auth:
-              - 'auth-service/**'
+              - '../../auth-service/**'
             academic:
-              - 'academic-service/**'
+              - '../../academic-service/**'
             registration:
-              - 'registration-service/**'
+              - '../../registration-service/**'
             hostel:
-              - 'hostel-service/**'
+              - '../../hostel-service/**'
             reporting:
-              - 'reporting-service/**'
+              - '../../reporting-service/**'
             notification:
-              - 'notification-service/**'
+              - '../../notification-service/**'
             payment:
-              - 'payment-service/**'
+              - '../../payment-service/**'
             gateway:
-              - 'gateway-service/**'
+              - '../../gateway-service/**'
             registry:
-              - 'service-registry/**'
+              - '../../service-registry/**'
             inventory:
-              - 'inventory-service/**'
+              - '../../inventory-service/**'
 
   # Build and push Docker images
   build-and-push:
