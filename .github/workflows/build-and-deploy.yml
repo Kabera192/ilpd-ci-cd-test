@@ -133,7 +133,7 @@ jobs:
         if: matrix.service.changed == 'true'
         uses: docker/build-push-action@v4
         with:
-          context: ./${{ matrix.service.name }}
+          context: ../../${{ matrix.service.name }}
           push: true
           tags: |
             ${{ env.DOCKER_USERNAME }}/${{ matrix.service.name }}:${{ steps.meta.outputs.tag }}
