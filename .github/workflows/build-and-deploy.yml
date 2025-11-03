@@ -7,52 +7,75 @@ on:
   pull_request:
     branches:
       - main
+  workflow_dispatch:
 
 env:
   DOCKER_REGISTRY: docker.io
   DOCKER_USERNAME: kaberagclap
   K8S_NAMESPACE: ilpd-mis
+  FORCE_BUILD_ALL: true  # Set to false after first successful build
 
 jobs:
   # Detect which services changed
   detect-changes:
     runs-on: ubuntu-latest
     outputs:
-      auth: ${{ steps.filter.outputs.auth }}
-      academic: ${{ steps.filter.outputs.academic }}
-      registration: ${{ steps.filter.outputs.registration }}
-      hostel: ${{ steps.filter.outputs.hostel }}
-      notification: ${{ steps.filter.outputs.notification }}
-      payment: ${{ steps.filter.outputs.payment }}
-      gateway: ${{ steps.filter.outputs.gateway }}
-      registry: ${{ steps.filter.outputs.registry }}
+      auth: ${{ steps.force-all.outputs.auth || steps.filter.outputs.auth }}
+      academic: ${{ steps.force-all.outputs.academic || steps.filter.outputs.academic }}
+      registration: ${{ steps.force-all.outputs.registration || steps.filter.outputs.registration }}
+      hostel: ${{ steps.force-all.outputs.hostel || steps.filter.outputs.hostel }}
+      reporting: ${{ steps.force-all.outputs.reporting || steps.filter.outputs.reporting }}
+      notification: ${{ steps.force-all.outputs.notification || steps.filter.outputs.notification }}
+      payment: ${{ steps.force-all.outputs.payment || steps.filter.outputs.payment }}
+      gateway: ${{ steps.force-all.outputs.gateway || steps.filter.outputs.gateway }}
+      registry: ${{ steps.force-all.outputs.registry || steps.filter.outputs.registry }}
+      inventory: ${{ steps.force-all.outputs.inventory || steps.filter.outputs.inventory }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      # Force all services to build if FORCE_BUILD_ALL is true
+      - name: Force build all services
+        id: force-all
+        if: env.FORCE_BUILD_ALL == 'true'
+        run: |
+          echo "auth=true" >> $GITHUB_OUTPUT
+          echo "academic=true" >> $GITHUB_OUTPUT
+          echo "registration=true" >> $GITHUB_OUTPUT
+          echo "hostel=true" >> $GITHUB_OUTPUT
+          echo "reporting=true" >> $GITHUB_OUTPUT
+          echo "notification=true" >> $GITHUB_OUTPUT
+          echo "payment=true" >> $GITHUB_OUTPUT
+          echo "gateway=true" >> $GITHUB_OUTPUT
+          echo "registry=true" >> $GITHUB_OUTPUT
+          echo "inventory=true" >> $GITHUB_OUTPUT
+      
       - uses: dorny/paths-filter@v2
         id: filter
+        if: env.FORCE_BUILD_ALL != 'true'
         with:
-          base: main
           filters: |
             auth:
-              - '../../auth-service/**'
+              - 'auth-service/**'
             academic:
-              - '../../academic-service/**'
+              - 'academic-service/**'
             registration:
-              - '../../registration-service/**'
+              - 'registration-service/**'
             hostel:
-              - '../../hostel-service/**'
+              - 'hostel-service/**'
             reporting:
-              - '../../reporting-service/**'
+              - 'reporting-service/**'
             notification:
-              - '../../notification-service/**'
+              - 'notification-service/**'
             payment:
-              - '../../payment-service/**'
+              - 'payment-service/**'
             gateway:
-              - '../../gateway-service/**'
+              - 'gateway-service/**'
             registry:
-              - '../../service-registry/**'
+              - 'service-registry/**'
             inventory:
-              - '../../inventory-service/**'
+              - 'inventory-service/**'
 
   # Build and push Docker images
   build-and-push:
@@ -79,7 +102,7 @@ jobs:
             changed: ${{ needs.detect-changes.outputs.gateway }}
           - name: service-registry
             changed: ${{ needs.detect-changes.outputs.registry }}
-          - name: inventory
+          - name: inventory-service
             changed: ${{ needs.detect-changes.outputs.inventory }}
     
     steps:
@@ -122,7 +145,7 @@ jobs:
   deploy:
     needs: build-and-push
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'  # Only deploy from main branch
+    if: github.ref == 'refs/heads/main'
     
     steps:
       - name: Checkout code
@@ -144,7 +167,6 @@ jobs:
         run: |
           COMMIT_HASH=${{ steps.vars.outputs.tag }}
           
-          # Update image tags for all services
           kubectl set image deployment/auth-service \
             auth-service=${{ env.DOCKER_USERNAME }}/auth-service:${COMMIT_HASH} \
             -n ${{ env.K8S_NAMESPACE }}
