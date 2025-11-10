@@ -26,13 +26,17 @@ COPY inventory-service/pom.xml ./inventory-service/pom.xml
 COPY notification-service/pom.xml ./notification-service/pom.xml
 COPY academic-service/pom.xml ./academic-service/pom.xml
 
+# Copy service pom.xml and download dependencies
+COPY gateway-service/pom.xml ./gateway-service/pom.xml
+RUN mvn dependency:resolve -pl gateway-service -am || true
+
 # Copy and build shared-library first
 COPY shared-library ./shared-library
 RUN mvn clean install -DskipTests -pl shared-library -am
 
 # Copy service pom.xml and download dependencies
-COPY gateway-service/pom.xml ./gateway-service/pom.xml
-RUN mvn dependency:resolve -pl gateway-service -am || true
+# COPY gateway-service/pom.xml ./gateway-service/pom.xml
+# RUN mvn dependency:resolve -pl gateway-service -am || true
 
 # Copy source code and build
 COPY gateway-service/src ./gateway-service/src
