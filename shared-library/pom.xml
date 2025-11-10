@@ -13,7 +13,7 @@
     <!-- groupId inherited from parent -->
     <artifactId>shared-library</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <packaging>pom</packaging>
+    <packaging>jar</packaging>
 
     <name>shared-library</name>
     <description>Common shared code for ILPD microservices</description>
