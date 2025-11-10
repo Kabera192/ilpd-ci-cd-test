@@ -26,17 +26,13 @@ COPY inventory-service/pom.xml ./inventory-service/pom.xml
 COPY notification-service/pom.xml ./notification-service/pom.xml
 COPY gateway-service/pom.xml ./gateway-service/pom.xml
 
+# Copy and build shared-library first
+COPY shared-library ./shared-library
+RUN mvn clean install -DskipTests -pl shared-library
+
 # Copy service pom.xml and download dependencies
 COPY payment-service/pom.xml ./payment-service/pom.xml
 RUN mvn dependency:resolve -pl payment-service -am || true
-
-# Copy and build shared-library first
-COPY shared-library ./shared-library
-RUN mvn clean install -DskipTests -pl shared-library -am
-
-# Copy service pom.xml and download dependencies
-# COPY payment-service/pom.xml ./payment-service/pom.xml
-# RUN mvn dependency:resolve -pl payment-service -am || true
 
 # Copy source code and build
 COPY payment-service/src ./payment-service/src
