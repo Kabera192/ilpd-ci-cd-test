@@ -26,13 +26,17 @@ COPY inventory-service/pom.xml ./inventory-service/pom.xml
 COPY notification-service/pom.xml ./notification-service/pom.xml
 COPY gateway-service/pom.xml ./gateway-service/pom.xml
 
+# Copy service pom.xml and download dependencies
+COPY auth-service/pom.xml ./auth-service/pom.xml
+RUN mvn dependency:resolve -pl auth-service -am || true
+
 # Copy and build shared-library first
 COPY shared-library ./shared-library
 RUN mvn clean install -DskipTests -pl shared-library -am
 
 # Copy service pom.xml and download dependencies
-COPY auth-service/pom.xml ./auth-service/pom.xml
-RUN mvn dependency:resolve -pl auth-service -am || true
+# COPY auth-service/pom.xml ./auth-service/pom.xml
+# RUN mvn dependency:resolve -pl auth-service -am || true
 
 # Copy source code and build
 COPY auth-service/src ./auth-service/src
