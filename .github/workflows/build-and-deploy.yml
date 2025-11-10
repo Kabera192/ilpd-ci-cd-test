@@ -141,7 +141,7 @@ jobs:
         if: matrix.service.changed == 'true'
         uses: docker/build-push-action@v4
         with:
-          context: ./${{ matrix.service.name }} 
+          context: . 
           file: ./${{ matrix.service.name }}/Dockerfile
           push: true
           # build-args: |
