@@ -26,13 +26,17 @@ COPY ./inventory-service/pom.xml ./inventory-service/pom.xml
 COPY ./notification-service/pom.xml ./notification-service/pom.xml
 COPY ./gateway-service/pom.xml ./gateway-service/pom.xml
 
+# Copy service pom.xml and download dependencies
+COPY ./hostel-service/pom.xml ./hostel-service/pom.xml
+RUN mvn dependency:resolve -pl hostel-service -am || true
+
 # Copy and build shared-library first
 COPY ./shared-library ./shared-library
 RUN mvn clean install -DskipTests -pl shared-library -am
 
 # Copy service pom.xml and download dependencies
-COPY ./hostel-service/pom.xml ./hostel-service/pom.xml
-RUN mvn dependency:resolve -pl hostel-service -am || true
+# COPY ./hostel-service/pom.xml ./hostel-service/pom.xml
+# RUN mvn dependency:resolve -pl hostel-service -am || true
 
 # Copy source code and build
 COPY ./hostel-service/src ./hostel-service/src

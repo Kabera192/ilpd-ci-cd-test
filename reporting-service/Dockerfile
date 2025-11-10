@@ -25,13 +25,17 @@ COPY inventory-service/pom.xml ./inventory-service/pom.xml
 COPY notification-service/pom.xml ./notification-service/pom.xml
 COPY gateway-service/pom.xml ./gateway-service/pom.xml
 
+# Copy service pom.xml and download dependencies
+COPY reporting-service/pom.xml ./reporting-service/pom.xml
+RUN mvn dependency:resolve -pl reporting-service -am || true
+
 # Copy and build shared-library first
 COPY shared-library ./shared-library
 RUN mvn clean install -DskipTests -pl shared-library -am
 
 # Copy service pom.xml and download dependencies
-COPY reporting-service/pom.xml ./reporting-service/pom.xml
-RUN mvn dependency:resolve -pl reporting-service -am || true
+# COPY reporting-service/pom.xml ./reporting-service/pom.xml
+# RUN mvn dependency:resolve -pl reporting-service -am || true
 
 # Copy source code and build
 COPY reporting-service/src ./reporting-service/src
