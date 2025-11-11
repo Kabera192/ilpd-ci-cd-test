@@ -115,6 +115,9 @@ jobs:
         with:
           distribution: 'corretto'
           java-version: 21
+     
+      - name: Build shared-lib
+        run: mvn -B -f ./shared-library/pom.xml clean install 
 
       - name: Build all modules
         run: mvn -B clean install -DskipTests 
