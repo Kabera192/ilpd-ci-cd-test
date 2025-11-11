@@ -4,7 +4,7 @@ FROM maven:3.9-eclipse-temurin-21-alpine AS build
 WORKDIR /build
 
 # Copy parent pom.xml first
-# COPY pom.xml ./pom.xml
+COPY pom.xml ./pom.xml
 
 # Copy Maven wrapper if it exists
 COPY reporting-service/mvnw* .
@@ -27,15 +27,15 @@ COPY gateway-service/pom.xml ./gateway-service/pom.xml
 
 # Copy and build shared-library first
 COPY shared-library ./shared-library
-RUN mvn clean install -DskipTests -pl shared-library
+RUN mvn clean install -DskipTests -f shared-library/pom.xml
 
 # Copy service pom.xml and download dependencies
 COPY reporting-service/pom.xml ./reporting-service/pom.xml
-RUN mvn dependency:resolve -pl reporting-service -am || true
+RUN mvn dependency:go-offline -f reporting-service/pom.xml
 
 # Copy source code and build
 COPY reporting-service/src ./reporting-service/src
-RUN mvn -B --no-transfer-progress clean package -DskipTests -pl reporting-service -am
+RUN mvn -B --no-transfer-progress clean package -DskipTests -f reporting-service/pom.xml
 
 # Runtime stage
 FROM eclipse-temurin:21-jre-alpine

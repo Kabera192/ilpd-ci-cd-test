@@ -5,7 +5,7 @@ FROM maven:3.9-eclipse-temurin-21-alpine AS build
 WORKDIR /build
 
 # Copy parent pom.xml first
-# COPY pom.xml ./pom.xml
+COPY pom.xml ./pom.xml
 
 # Copy Maven wrapper if it exists
 COPY service-registry/mvnw* .
@@ -29,15 +29,15 @@ COPY gateway-service/pom.xml ./gateway-service/pom.xml
 
 # Copy and build shared-library first
 COPY shared-library ./shared-library
-RUN mvn clean install -DskipTests -pl shared-library
+RUN mvn clean install -DskipTests -f shared-library/pom.xml
 
 # Copy service pom.xml and download dependencies
 COPY service-registry/pom.xml ./service-registry/pom.xml
-RUN mvn dependency:resolve -pl service-registry -am || true
+RUN mvn dependency:go-offline -f service-registry/pom.xml
 
 # Copy source code and build
 COPY service-registry/src ./service-registry/src
-RUN mvn -B --no-transfer-progress clean package -DskipTests -pl service-registry -am
+RUN mvn -B --no-transfer-progress clean package -DskipTests -f service-registry/pom.xml
 
 # Runtime stage
 FROM eclipse-temurin:21-jre-alpine
