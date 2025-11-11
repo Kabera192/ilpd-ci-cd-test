@@ -71,7 +71,7 @@
             <groupId>org.mapstruct</groupId>
             <artifactId>mapstruct</artifactId>
             <version>${mapstruct.version}</version>
-        </dependency>
+    	</dependency>
 
         <dependency>
             <groupId>org.mapstruct</groupId>
@@ -97,7 +97,13 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-amqp</artifactId>
-        </dependency>
+    	</dependency>
+	
+	<!-- Shared Library -->
+	<dependency>
+		<groupId>rw.ac.ilpd</groupId>
+		<artifactId>shared-library</artifactId>
+	</dependency>
     </dependencies>
     <dependencyManagement>
         <dependencies>
