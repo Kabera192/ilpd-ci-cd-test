@@ -110,13 +110,16 @@ jobs:
         if: matrix.service.changed == 'true'
         uses: actions/checkout@v4
 
+      - name: Build all modules
+        run: mvn -B clean install -DskipTests 
+
       - name: Cache Maven repository
         if: matrix.service.changed == 'true'
         uses: actions/cache@v4
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
-          restore-keys: ${{ runner.os }}-m2-
+          restore-keys: ${{ runner.os }}-m2
 
       - name: Set up Docker Buildx
         if: matrix.service.changed == 'true'
