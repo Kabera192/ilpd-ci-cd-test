@@ -3,12 +3,15 @@ FROM maven:3.9-eclipse-temurin-21-alpine AS build
 
 WORKDIR /build
 
-# Copy parent pom.xml first
-COPY pom.xml ./pom.xml
-
 # Copy Maven wrapper if it exists
 COPY payment-service/mvnw* .
 COPY payment-service/.mvn .mvn
+
+# Copy parent pom.xml first
+COPY pom.xml ./pom.xml
+
+# Install parent pom in local repo
+RUN mvn install -N
 
 # Create directories for all microservices
 RUN mkdir -p auth-service reporting-service payment-service \

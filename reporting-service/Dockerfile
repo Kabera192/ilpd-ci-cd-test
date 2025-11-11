@@ -3,12 +3,15 @@ FROM maven:3.9-eclipse-temurin-21-alpine AS build
 
 WORKDIR /build
 
-# Copy parent pom.xml first
-COPY pom.xml ./pom.xml
-
 # Copy Maven wrapper if it exists
 COPY reporting-service/mvnw* .
 COPY reporting-service/.mvn .mvn
+
+# Copy parent pom.xml first
+COPY pom.xml ./pom.xml
+
+# Install parent pom in local repo
+RUN mvn install -N
 
 RUN mkdir -p auth-service reporting-service payment-service \
     registration-service hostel-service service-registry \
