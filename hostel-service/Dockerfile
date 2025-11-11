@@ -33,6 +33,11 @@ COPY ./gateway-service/pom.xml ./gateway-service/pom.xml
 COPY ./shared-library ./shared-library
 RUN mvn clean install -DskipTests -f shared-library/pom.xml
 
+# Debug for what is in the target folder
+RUN ls -la shared-library/target/
+RUN jar tf shared-library/target/*.jar | grep "dto/hostel"
+RUN ls -la ~/.m2/repository/rw/ac/ilpd/shared-library/
+
 # Copy service pom.xml and download dependencies
 COPY ./hostel-service/pom.xml ./hostel-service/pom.xml
 RUN mvn dependency:go-offline -f hostel-service/pom.xml
