@@ -5,7 +5,7 @@ FROM maven:3.9-eclipse-temurin-21-alpine AS build
 WORKDIR /build
 
 # Copy parent pom.xml first
-COPY pom.xml ./pom.xml
+# COPY pom.xml ./pom.xml
 
 # Copy Maven wrapper if it exists
 COPY service-registry/mvnw* .
