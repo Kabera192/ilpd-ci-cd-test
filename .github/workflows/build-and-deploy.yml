@@ -13,7 +13,7 @@ env:
   DOCKER_REGISTRY: docker.io
   DOCKER_USERNAME: kaberagclap
   K8S_NAMESPACE: ilpd-mis
-  FORCE_BUILD_ALL: true  # Set to false after first successful build
+  FORCE_BUILD_ALL: false  # Set to false after first successful build
 
 jobs:
   # Detect which services changed

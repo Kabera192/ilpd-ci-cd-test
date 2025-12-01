@@ -83,6 +83,7 @@ private final UserClient userClient;
     }
     @Transactional(readOnly = true)
     public Optional<Lecturer> getEntity(String id){
+	// This is a comment to test the CI/CD pipeline!
         return lecturerRepository.findById(UUID.fromString(id));
     }
 

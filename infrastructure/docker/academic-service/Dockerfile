@@ -1,44 +1,68 @@
-# Specify jdk base image
-FROM openjdk:21-jdk-alpine AS build
+# Some test change
 
-# Set working directory
-WORKDIR /app
+# Build stage
+FROM maven:3.9-eclipse-temurin-21-alpine AS build
 
-COPY pom.xml
+WORKDIR /build
 
-# Download maven dependencies
-RUN mvn dependency:go-offline -B
+# Copy Maven wrapper if it exists
+COPY academic-service/mvnw* .
+COPY academic-service/.mvn .mvn
 
-# Copy the source code
-COPY src ./src
+# Copy parent pom.xml first
+COPY pom.xml ./pom.xml
 
-# Build the applicaiton
-# Skip tests since they will be run in the CI/CD pipeline
-RUN mvn clean package -DskipTests
+# Install parent pom in local repo
+RUN mvn install -N
 
-RUN mkdir -p target/dependency && cd target/dependency && jar -xf ../*.jar
+# Create directories for all microservices
+RUN mkdir -p auth-service reporting-service payment-service \
+    registration-service hostel-service service-registry \
+    inventory-service notification-service gateway-service \
+    academic-service
 
-FROM openjdk:21-jdk-alpine
+COPY auth-service/pom.xml ./auth-service/pom.xml
+COPY reporting-service/pom.xml ./reporting-service/pom.xml
+COPY payment-service/pom.xml ./payment-service/pom.xml
+COPY registration-service/pom.xml ./registration-service/pom.xml
+COPY hostel-service/pom.xml ./hostel-service/pom.xml
+COPY service-registry/pom.xml ./service-registry/pom.xml
+COPY inventory-service/pom.xml ./inventory-service/pom.xml
+COPY notification-service/pom.xml ./notification-service/pom.xml
+COPY gateway-service/pom.xml ./gateway-service/pom.xml
+
+# Copy and build shared-library first
+COPY shared-library ./shared-library
+RUN mvn clean install -DskipTests -f shared-library/pom.xml
+
+# Copy service pom.xml and download dependencies
+COPY academic-service/pom.xml ./academic-service/pom.xml
+RUN mvn dependency:go-offline -f academic-service/pom.xml
+
+# Copy source code and build
+COPY academic-service/src ./academic-service/src
+RUN mvn -B --no-transfer-progress clean package -DskipTests -f academic-service/pom.xml
+
+# Runtime stage
+FROM eclipse-temurin:21-jre-alpine
 
 LABEL maintainer="support@ilpd.ac.rw"
 LABEL service="academic-service"
 
-# Create non-root user for security
+# Create non-root user
 RUN addgroup -S app && adduser -S app -G app
 
-# Set working directory
 WORKDIR /app
 
-# Copy the JAR file from build stage
-COPY --from=build /app/target/*.jar app.jar
+# Copy JAR from build stage
+COPY --from=build /build/academic-service/target/*.jar app.jar
 
-# Change ownership to non-root user
+# Change ownership
 RUN chown -R app:app /app
 
 # Switch to non-root user
-USER app:app
+USER app
 
 EXPOSE 8092
 
-# Run the application
 ENTRYPOINT ["java", "-jar", "app.jar"]
