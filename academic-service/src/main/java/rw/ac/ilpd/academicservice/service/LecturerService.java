@@ -70,6 +70,7 @@ private final UserClient userClient;
 
         // Save new lecturer
        try {
+	   // this is a comment that i am testing!
            Lecturer savedLecturer = lecturerRepository.save(lecturerMapper.toLecturer(lecturer));
            return lecturerMapper.fromLecturer(savedLecturer);
        }
